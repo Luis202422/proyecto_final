@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa de Piura</title>
+    <!-- Incluir hojas de estilo de Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <!-- Estilo personalizado para el mapa -->
+    <style>
+        #map {
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Div para contener el mapa -->
+<div id="map"></div>
+
+<!-- Incluir la biblioteca Leaflet -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+    // Código JavaScript para inicializar el mapa
+    var map = L.map('map').setView([-5.19449, -80.63282], 12);  // Coordenadas del centro de Piura y zoom inicial
+
+    // Capa base de OpenStreetMap
+    var basemapOSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributor'
+    }).addTo(map);
+
+    // Capa de Google Satellite
+    var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0','mt1','mt2','mt3']
+    });
+
+    // Capa de Google Hybrid
+    var googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0','mt1','mt2','mt3']
+    });
+
+    // URL del servidor WMS para Piura (debe ser ajustado según tu configuración)
+    var wmsUrl = 'http://localhost:8080/geoserver/webgis_piura/wms';
+
+    // Capa WMS para límites departamentales de Piura
+    var departamento_piura = L.tileLayer.wms(wmsUrl, {
+        layers: 'webgis_piura:departamento_piura',  // Nombre de la capa en GeoServer para límites departamentales de Piura
+        format: 'image/png',
+        transparent: true,
+        version: '1.1.1',
+        attribution: "SENCICO"
+    });
+
+    // Capa WMS para otros datos de interés en Piura (ejemplo: centros educativos)
+    var colegios_piura = L.tileLayer.wms(wmsUrl, {
+        layers: 'webgis_piura:colegios',  // Nombre de la capa en GeoServer para colegios en Piura
+        format: 'image/png',
+        transparent: true,
+        version: '1.1.1',
+        attribution: "SENCICO"
+    });
+
+    // Capa WMS para otros datos de interés en Piura (ejemplo: hospitales)
+    var hospital_piura = L.tileLayer.wms(wmsUrl, {
+        layers: 'webgis_piura:hospital',  // Nombre de la capa en GeoServer para hospitales en Piura
+        format: 'image/png',
+        transparent: true,
+        version: '1.1.1',
+        attribution: "SENCICO"
+    });
+
+    // Capa WMS para otros datos de interés en Piura (ejemplo: restaurantes)
+    var restaurante_piura = L.tileLayer.wms(wmsUrl, {
+        layers: 'webgis_piura:restaurante',  // Nombre de la capa en GeoServer para restaurantes en Piura
+        format: 'image/png',
+        transparent: true,
+        version: '1.1.1',
+        attribution: "SENCICO"
+    });
+
+    // Definir capas base y capas sobrepuestas para el control de capas
+    var baseMaps = {
+        "OSM": basemapOSM,
+        "Híbrido": googleHybrid,
+        "Satelital": googleSat
+    };
+
+    var overlayMaps = {
+        "Límites departamentales": departamento_piura,
+        "Centros educativos": colegios_piura,
+        "Hospitales": hospital_piura,
+        "Restaurantes": restaurante_piura
+    };
+
+    // Control de capas (layers control)
+    L.control.layers(baseMaps, overlayMaps, {
+        position: 'topright',
+        collapsed: false
+    }).addTo(map);
+
+    // Control de escala (scale control)
+    L.control.scale({
+        imperial: false
+    }).addTo(map);
+</script>
+
+</body>
+</html>
